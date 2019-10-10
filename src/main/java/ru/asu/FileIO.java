@@ -15,11 +15,11 @@ public class FileIO {
         this.scanner = new Scanner(reader);
     }
 
-    private String readLine(){
+    public String readLine(){
         return scanner.nextLine();
     }
 
-    private boolean writeLine(String line) {
+    public boolean writeLine(String line) {
         try {
             writer.write(line);
         } catch (IOException e) {
