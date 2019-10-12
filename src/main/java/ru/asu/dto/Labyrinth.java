@@ -1,4 +1,4 @@
-package ru.asu;
+package ru.asu.dto;
 
 public class Labyrinth {
 

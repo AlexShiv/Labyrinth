@@ -1,28 +1,29 @@
 package ru.asu;
 
 
+import ru.asu.dto.Labyrinth;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Analizer {
+public class Analyzer {
     private FileIO fileIO;
 
-    public Analizer(String inputFilePath, String outputFilePath) throws IOException {
+    public Analyzer(String inputFilePath, String outputFilePath) throws IOException {
         this.fileIO = new FileIO(inputFilePath, outputFilePath);
     }
 
 
-    public void buildLabyrinth() {
-        int countLab = Integer.parseInt(fileIO.readLine());
-        List<Labyrinth> ways = new ArrayList<>();
-        readWays(countLab, ways);
-
-
+     public void buildLabyrinth() {
+        List<Labyrinth> ways = readWays();
     }
 
 
-    private void readWays(int countLab, List<Labyrinth> ways) {
+    private List<Labyrinth> readWays() {
+        int countLab = Integer.parseInt(fileIO.readLine());
+
+        List<Labyrinth> ways = new ArrayList<>();
         for (int i = 0; i < countLab; i++) {
             String line = fileIO.readLine();
             String[] s = line.split(" ");
@@ -30,5 +31,7 @@ public class Analizer {
             ways.add(labyrinth);
             System.out.println(line);
         }
+
+        return ways;
     }
 }

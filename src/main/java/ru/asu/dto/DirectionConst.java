@@ -1,4 +1,4 @@
-package ru.asu;
+package ru.asu.dto;
 
 public enum DirectionConst {
     ONE(true, false, false, false, "1"),
