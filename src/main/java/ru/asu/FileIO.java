@@ -5,17 +5,16 @@ import java.util.Scanner;
 
 public class FileIO {
 
-    private final Reader reader;
     private final Scanner scanner;
     private final Writer writer;
 
     public FileIO(String inputFilePath, String outputFilePath) throws IOException {
-        this.reader = new FileReader(inputFilePath);
-        this.writer = new FileWriter(outputFilePath);
+        Reader reader = new FileReader(inputFilePath);
         this.scanner = new Scanner(reader);
+        this.writer = new FileWriter(outputFilePath);
     }
 
-    public String readLine(){
+    public String readLine() {
         return scanner.nextLine();
     }
 

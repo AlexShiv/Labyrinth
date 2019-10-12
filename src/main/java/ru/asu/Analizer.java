@@ -1,7 +1,6 @@
 package ru.asu;
 
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,25 +13,22 @@ public class Analizer {
     }
 
 
-    public void buildLabyrinth(){
+    public void buildLabyrinth() {
         int countLab = Integer.parseInt(fileIO.readLine());
-        List<String> ways = new ArrayList<>();
+        List<Labyrinth> ways = new ArrayList<>();
         readWays(countLab, ways);
 
-        for(String lab: ways){
-            String[] labyrints = lab.split(" ");
 
-        }
     }
 
 
-    private void readWays(int countLab, List<String> ways) {
+    private void readWays(int countLab, List<Labyrinth> ways) {
         for (int i = 0; i < countLab; i++) {
             String line = fileIO.readLine();
-            ways.add(line);
+            String[] s = line.split(" ");
+            Labyrinth labyrinth = new Labyrinth(s[0], s[1]);
+            ways.add(labyrinth);
             System.out.println(line);
         }
     }
-
-    private void
 }
