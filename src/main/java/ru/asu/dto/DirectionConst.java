@@ -1,6 +1,7 @@
 package ru.asu.dto;
 
 public enum DirectionConst {
+    ZERO(false, false, false, false, "0"),
     ONE(true, false, false, false, "1"),
     TWO(false, true, false, false, "2"),
     THREE(true, true, false, false, "3"),
