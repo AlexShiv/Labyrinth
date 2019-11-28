@@ -30,15 +30,29 @@ public class Analyzer {
         for (Labyrinth way : ways) {
             List<LabPoint> labPoints = new ArrayList<>();
             direction = 's';
-
+            x = 0;
+            y = 0;
             String in = way.getIn();
             String out = way.getOut();
             fillLabPath(labPoints, in);
+            reverseDirection();
             fillLabPath(labPoints, out);
 
             System.out.println("*********");
             labPoints.forEach(System.out::println);
 
+        }
+    }
+
+    private void reverseDirection() {
+        if (direction == 'n') {
+            direction = 's';
+        } else if (direction == 'e') {
+            direction = 'w';
+        } else if (direction == 's') {
+            direction = 'n';
+        } else {
+            direction = 'e';
         }
     }
 
@@ -58,59 +72,16 @@ public class Analyzer {
 
                 // создаем следующую точку маршрута
 
+
+                // проверяем в какую сторону смотрит герой
+                currentDirection = getDirectionConst(currentDirection);
+
                 int finalX = x;
                 int finalY = y;
-                LabPoint nextPoint = null;
                 Optional<LabPoint> first = labPoints.stream().filter(labPoint -> labPoint.getPoint().getX() == finalX && labPoint.getPoint().getY() == finalY).findFirst();
-                if (first.isPresent()){
-                    nextPoint = first.get();
-                } else {
-                    nextPoint = new LabPoint(new Point(x, y));
-                }
-                // проверяем в какую сторону смотрит герой
-                switch (direction) {
-                    case 'n':
-                        y--;
-                        currentDirection = findByCompass(true, currentDirection.isSouth(), currentDirection.isWest(), currentDirection.isEast());
-                        if (first.isPresent()) {
-                            nextDirection = findByCompass(nextPoint.getDirectionConst().isNorth(), true, nextPoint.getDirectionConst().isWest(), false);
-                        } else {
-                            nextDirection = findByCompass(false, true, false, false);
-                        }
-                        break;
-                    case 's':
-                        y++;
-                        currentDirection = findByCompass(currentDirection.isNorth(), true, currentDirection.isWest(), currentDirection.isEast());
-                        if (first.isPresent()){
-                            nextDirection = findByCompass(true, nextPoint.getDirectionConst().isSouth(), nextPoint.getDirectionConst().isWest(), nextPoint.getDirectionConst().isEast());
-                        }
-                        else {
-                            nextDirection = findByCompass(true, false, false, false);
-                        }
-                        break;
-                    case 'w':
-                        x--;
-                        currentDirection = findByCompass(currentDirection.isNorth(), currentDirection.isSouth(), true, currentDirection.isEast());
-                        if (first.isPresent()){
-                            nextDirection = findByCompass(nextPoint.getDirectionConst().isNorth(), nextPoint.getDirectionConst().isSouth(), nextPoint.getDirectionConst().isWest(), true);
-                        }
-                        else {
-                            nextDirection = findByCompass(false, false, false, true);
-                        }
-                        break;
-                    case 'e':
-                        x++;
-                        currentDirection = findByCompass(currentDirection.isNorth(), currentDirection.isSouth(), currentDirection.isWest(), true);
-                        if (first.isPresent()){
-                            nextDirection = findByCompass(nextPoint.getDirectionConst().isNorth(), nextPoint.getDirectionConst().isSouth(), true, nextPoint.getDirectionConst().isEast());
-                        }
-                        else {
-                            nextDirection = findByCompass(false, false, true, false);
-                        }
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + direction);
-                }
+                LabPoint nextPoint = first.orElseGet(() -> new LabPoint(new Point(x, y)));
+                nextDirection = getDirectionConst(nextPoint, first);
+
                 currentPoint.setDirectionConst(currentDirection);
                 nextPoint.setDirectionConst(nextDirection);
 
@@ -138,6 +109,67 @@ public class Analyzer {
                 }
             }
         }
+    }
+
+    private DirectionConst getDirectionConst(DirectionConst currentDirection) {
+        switch (direction) {
+            case 'n':
+                y--;
+                currentDirection = findByCompass(true, currentDirection.isSouth(), currentDirection.isWest(), currentDirection.isEast());
+                break;
+            case 's':
+                y++;
+                currentDirection = findByCompass(currentDirection.isNorth(), true, currentDirection.isWest(), currentDirection.isEast());
+                break;
+            case 'w':
+                x--;
+                currentDirection = findByCompass(currentDirection.isNorth(), currentDirection.isSouth(), true, currentDirection.isEast());
+                break;
+            case 'e':
+                x++;
+                currentDirection = findByCompass(currentDirection.isNorth(), currentDirection.isSouth(), currentDirection.isWest(), true);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + direction);
+        }
+        return currentDirection;
+    }
+
+    private DirectionConst getDirectionConst(LabPoint nextPoint, Optional<LabPoint> first) {
+        DirectionConst nextDirection;
+        switch (direction) {
+            case 'n':
+                if (first.isPresent()) {
+                    nextDirection = findByCompass(nextPoint.getDirectionConst().isNorth(), true, nextPoint.getDirectionConst().isWest(), false);
+                } else {
+                    nextDirection = findByCompass(false, true, false, false);
+                }
+                break;
+            case 's':
+                if (first.isPresent()) {
+                    nextDirection = findByCompass(true, nextPoint.getDirectionConst().isSouth(), nextPoint.getDirectionConst().isWest(), nextPoint.getDirectionConst().isEast());
+                } else {
+                    nextDirection = findByCompass(true, false, false, false);
+                }
+                break;
+            case 'w':
+                if (first.isPresent()) {
+                    nextDirection = findByCompass(nextPoint.getDirectionConst().isNorth(), nextPoint.getDirectionConst().isSouth(), nextPoint.getDirectionConst().isWest(), true);
+                } else {
+                    nextDirection = findByCompass(false, false, false, true);
+                }
+                break;
+            case 'e':
+                if (first.isPresent()) {
+                    nextDirection = findByCompass(nextPoint.getDirectionConst().isNorth(), nextPoint.getDirectionConst().isSouth(), true, nextPoint.getDirectionConst().isEast());
+                } else {
+                    nextDirection = findByCompass(false, false, true, false);
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + direction);
+        }
+        return nextDirection;
     }
 
 
