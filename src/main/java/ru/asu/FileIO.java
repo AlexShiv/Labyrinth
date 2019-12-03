@@ -21,6 +21,7 @@ public class FileIO {
     public boolean writeLine(String line) {
         try {
             writer.write(line);
+            writer.flush();
         } catch (IOException e) {
             System.out.println("Error while writing in file " + line);
             return false;

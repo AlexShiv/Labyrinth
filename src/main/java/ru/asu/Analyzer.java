@@ -26,7 +26,8 @@ public class Analyzer {
     public void buildLabyrinth() {
         List<Labyrinth> ways = readWays();
 
-        for (Labyrinth way : ways) {
+        for (int i = 0; i < ways.size(); i++) {
+            Labyrinth way = ways.get(i);
             List<LabPoint> labPoints = new ArrayList<>();
             direction = 's';
             x = 0;
@@ -54,17 +55,16 @@ public class Analyzer {
                 }
             }
 
-
-            /*System.out.println("***********************");
-            labPoints.forEach(System.out::println);*/
-            System.out.println("***********************");
-            printLab(labPoints);
+            String result = "Case #" + (i + 1) + ":\n";
+            System.out.print(result);
+            writeWays(result + printLab(labPoints));
 
 
         }
     }
 
-    private void printLab(List<LabPoint> labPoints) {
+    private String printLab(List<LabPoint> labPoints) {
+        String result = "";
         List<LabPoint> sortedList = labPoints.stream().sorted((o1, o2) -> {
             int res = (int) (o1.getPoint().getY() - o2.getPoint().getY());
             if (res == 0) {
@@ -73,8 +73,22 @@ public class Analyzer {
             return res;
         }).collect(Collectors.toList());
 
-
-        sortedList.forEach(System.out::println);
+        String out = "";
+        for (int i = 0; i < sortedList.size() - 1; i++) {
+            if (sortedList.get(i).getPoint().getY() == sortedList.get(i + 1).getPoint().getY()) {
+                out += sortedList.get(i).getDirectionConst().getName();
+            } else {
+                out += sortedList.get(i).getDirectionConst().getName();
+                System.out.println(out);
+                //запись в файл
+                result += out + "\n";
+                out = "";
+            }
+        }
+        out = out + sortedList.get(sortedList.size() - 1).getDirectionConst().getName();
+        System.out.println(out);
+        result += out + "\n";
+        return result;
     }
 
     private void reverseDirection() {
@@ -220,10 +234,13 @@ public class Analyzer {
             String[] s = line.split(" ");
             Labyrinth labyrinth = new Labyrinth(s[0], s[1]);
             ways.add(labyrinth);
-            System.out.println(line);
         }
 
         return ways;
+    }
+
+    private void writeWays(String out) {
+        fileIO.writeLine(out);
     }
 
     private DirectionConst findByCompass(boolean north, boolean south, boolean west, boolean east) {
@@ -232,13 +249,6 @@ public class Analyzer {
                         && directionConst.isSouth() == south
                         && directionConst.isWest() == west
                         && directionConst.isEast() == east)
-                .findAny();
-        return dir.orElseThrow();
-    }
-
-    private DirectionConst findByDirectionName(String name) {
-        Optional<DirectionConst> dir = Arrays.stream(DirectionConst.values())
-                .filter(directionConst -> directionConst.getName().equals(name))
                 .findAny();
         return dir.orElseThrow();
     }
