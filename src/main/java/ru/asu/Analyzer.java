@@ -7,10 +7,9 @@ import ru.asu.dto.Labyrinth;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Analyzer {
     private FileIO fileIO;
@@ -32,16 +31,50 @@ public class Analyzer {
             direction = 's';
             x = 0;
             y = 0;
+
+            int endX = 0;
+            int endY = 0;
             String in = way.getIn();
             String out = way.getOut();
+
             fillLabPath(labPoints, in);
+
+            LabPoint exit = labPoints.get(labPoints.size() - 1);
+
+            endX = (int) exit.getPoint().getX();
+            endY = (int) exit.getPoint().getY();
             reverseDirection();
             fillLabPath(labPoints, out);
 
-            System.out.println("*********");
-            labPoints.forEach(System.out::println);
+            Iterator<LabPoint> iterator = labPoints.iterator();
+            while (iterator.hasNext()) {
+                Point point = iterator.next().getPoint();
+                if ((point.getX() == endX && point.getY() == endY) || (point.getX() == 0 && point.getY() == -1)) {
+                    iterator.remove();
+                }
+            }
+
+
+            /*System.out.println("***********************");
+            labPoints.forEach(System.out::println);*/
+            System.out.println("***********************");
+            printLab(labPoints);
+
 
         }
+    }
+
+    private void printLab(List<LabPoint> labPoints) {
+        List<LabPoint> sortedList = labPoints.stream().sorted((o1, o2) -> {
+            int res = (int) (o1.getPoint().getY() - o2.getPoint().getY());
+            if (res == 0) {
+                return (int) (o1.getPoint().getX() - o2.getPoint().getX());
+            }
+            return res;
+        }).collect(Collectors.toList());
+
+
+        sortedList.forEach(System.out::println);
     }
 
     private void reverseDirection() {
@@ -66,26 +99,32 @@ public class Analyzer {
                     continue;
                 }
                 // берем текущую точку
-                LabPoint currentPoint = labPoints.get(labPoints.size() - 1);
+                LabPoint currentPoint = labPoints.stream()
+                        .filter(labPoint -> labPoint.getPoint().getX() == x && labPoint.getPoint().getY() == y)
+                        .findFirst()
+                        .orElseThrow();
                 DirectionConst currentDirection = currentPoint.getDirectionConst();
                 DirectionConst nextDirection;
 
-                // создаем следующую точку маршрута
-
-
-                // проверяем в какую сторону смотрит герой
+                // проверяем в какую сторону смотрит герой, меняем x и y
                 currentDirection = getDirectionConst(currentDirection);
 
                 int finalX = x;
                 int finalY = y;
-                Optional<LabPoint> first = labPoints.stream().filter(labPoint -> labPoint.getPoint().getX() == finalX && labPoint.getPoint().getY() == finalY).findFirst();
-                LabPoint nextPoint = first.orElseGet(() -> new LabPoint(new Point(x, y)));
+                Optional<LabPoint> first = labPoints.stream()
+                        .filter(labPoint -> labPoint.getPoint().getX() == finalX && labPoint.getPoint().getY() == finalY)
+                        .findFirst();
+
+                LabPoint nextPoint = first.orElseGet(() -> {
+                    LabPoint labPoint = new LabPoint(new Point(x, y));
+                    labPoints.add(labPoint);
+                    return labPoint;
+                });
                 nextDirection = getDirectionConst(nextPoint, first);
 
                 currentPoint.setDirectionConst(currentDirection);
                 nextPoint.setDirectionConst(nextDirection);
 
-                labPoints.add(nextPoint);
 
             } else if (c == 'L') {
                 if (direction == 'n') {
@@ -171,7 +210,6 @@ public class Analyzer {
         }
         return nextDirection;
     }
-
 
     private List<Labyrinth> readWays() {
         int countLab = Integer.parseInt(fileIO.readLine());
